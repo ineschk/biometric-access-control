@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+*.pyc
+data/users/
+pretrained_models/
+*.wav
+*.npy
+.env
