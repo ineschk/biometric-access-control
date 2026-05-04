@@ -16,6 +16,12 @@ from modules.face_module import enroll_face, verify_face
 from modules.voice_module import enroll_voice, verify_voice
 
 
+# Paramètres de fusion
+FACE_WEIGHT = 0.6      # Poids du visage
+VOICE_WEIGHT = 0.4     # Poids de la voix
+FUSION_THRESHOLD = 0.5  # Seuil final pour accès accordé
+
+
 def enroll(name: str):
     print(f"\n{'='*50}")
     print(f"  ENRÔLEMENT : {name.upper()}")
@@ -56,14 +62,23 @@ def verify():
     print(f"\n--- Étape 3/3 : Vérification vocale ({name}) ---")
     voice_ok, voice_score = verify_voice(name)
 
-    # Décision finale
+    # ===== FUSION SCORE-LEVEL =====
+    # Normalise les scores si nécessaire (déjà entre 0 et 1)
+    # Pondération : 60% visage + 40% voix
+    final_score = (FACE_WEIGHT * face_score) + (VOICE_WEIGHT * voice_score)
+
     print(f"\n{'='*50}")
-    if face_ok and voice_ok:
-        print(f"  ✅ ACCÈS ACCORDÉ — Bienvenue, {name.upper()} !")
-        print(f"  Visage: {face_score:.2f} | Voix: {voice_score:.2f}")
+    print(f"  RÉSULTATS")
+    print(f"  Visage: {face_score:.3f} (poids {FACE_WEIGHT})")
+    print(f"  Voix:   {voice_score:.3f} (poids {VOICE_WEIGHT})")
+    print(f"  ─────────────────────────")
+    print(f"  Score fusionné: {final_score:.3f} (seuil: {FUSION_THRESHOLD})")
+
+    # Décision finale
+    if final_score >= FUSION_THRESHOLD:
+        print(f"\n  ✅ ACCÈS ACCORDÉ — Bienvenue, {name.upper()} !")
     else:
-        print(f"  🚫 ACCÈS REFUSÉ")
-        print(f"  Visage: {face_score:.2f} | Voix: {voice_score:.2f}")
+        print(f"\n  🚫 ACCÈS REFUSÉ")
     print(f"{'='*50}\n")
 
 
